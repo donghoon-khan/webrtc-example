@@ -7,7 +7,10 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <script src="./js/hls.js"></script>
+    <!-- videojs includes  -->
+    <link href="https://unpkg.com/video.js@7.8.3/dist/video-js.css" rel="stylesheet">
+    <script src="https://unpkg.com/video.js@7.8.3/dist/video.js"></script>
+    <script src="https://unpkg.com/@videojs/http-streaming@1.13.3/dist/videojs-http-streaming.js"></script>
 </head>
 
 <body>
@@ -17,6 +20,19 @@
                 <h3 class="col text-muted">CCTV</h3>
             </div>
         </div>
+
+        <!-- HLS Player -->
+	<div id="video_container">
+		<video id="video-player" 
+			class="video-js vjs-default-skin vjs-big-play-centered"
+			controls preload="auto" muted>
+			<p class="vjs-no-js">
+				To view this video please enable JavaScript, and consider upgrading
+				to a web browser that
+			</p>
+		</video>
+	</div>
+
 
         <div id="hls-viewer">
 
@@ -63,9 +79,19 @@
     import { WebRTCAdaptor } from "./js/webrtc_adaptor.js"
     import { CctvAdaptor } from "./js/cctvAdaptor.js"
 
+    var player = videojs('video-player');
+    console.log('Created VideoJS Player');
+    player.src({
+        src: "http://media.pictonm.com:5080/LiveApp/streams/41HLS.m3u8",
+        type: 'application/x-mpegURL'
+    });
+    player.ready(function() {
+            player.play();
+    });
+
     var cctvAdaptor = new CctvAdaptor({
-        hlsStream: "http://192.168.41.195:5080/LiveApp/streams/18HLS.m3u8",
-        webRtcSignalingServer: "ws://192.168.41.195:5080/WebRTCAppEE/websocket",
+        hlsStream: "http://media.pictonm.com:5080/LiveApp/streams/41HLS.m3u8",
+        //webRtcSignalingServer: "ws://192.168.41.195:5080/WebRTCAppEE/websocket",
     });
 
     //$("#hls-viewer").append(cctvAdaptor.getHlsVideo());

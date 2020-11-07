@@ -28,9 +28,28 @@ export class CctvAdaptor{
         }
     }
 
+    tryToPlay(stream, extension, noStreamCallback) {
+        fetch(stream + extension, {method:'HEAD'})
+        .then(function(response) {
+            if (response.status == 200) {
+                //initializePlayer(stream, extension);
+            }
+            else {
+                console.error("No stream found");
+                if (typeof noStreamCallback != "undefined") {
+                    console.log("error!!!!!!!!!!!!!!!!!!");
+                        //noStreamCallback();
+                }
+            }
+        }).catch(function(err) {
+            console.error("Error: " + err);
+        });
+    }
+
     createHlsVideo(videoSrc) {
+        this.tryToPlay("http://media.pictonm.com:5080/LiveApp/streams/41HLS", ".m3u8", "test");
         let video = document.createElement("video");
-        $(video).prop("muted", true);
+        /*$(video).prop("muted", true);
         $(video).prop("controls", true);
         if (Hls.isSupported()) {
             this.#hls = new Hls();
@@ -47,7 +66,7 @@ export class CctvAdaptor{
             });
         }
         this.#hlsVideo = video;
-        return this.#hlsVideo;
+        return this.#hlsVideo;*/
     }
 
     getHlsVideo() {
