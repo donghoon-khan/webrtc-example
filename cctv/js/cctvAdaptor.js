@@ -2,12 +2,11 @@ import { WebRTCAdaptor } from "./webrtc_adaptor.js"
 
 export class CctvAdaptor{
 
-    #hls
-    #hlsVideo
-    #webRtcAdaptor
-    #webRtcVideo
     constructor(initialValues) {
         console.log("Construct CCTV Adaptor");
+
+        this.src = null;
+        this.type = null;
 
         this.hlsStream = null;
         this.streamId = null;
@@ -17,6 +16,10 @@ export class CctvAdaptor{
             if (initialValues.hasOwnProperty(key)) {
                 this[key] = initialValues[key];
             }
+        }
+
+        if (this.type == "hls") {
+            this.createHlsVideo()
         }
 
         if (this.hlsStream != null) {

@@ -77,9 +77,22 @@
 </body>
 <script type="module">
     import { WebRTCAdaptor } from "./js/webrtc_adaptor.js"
-    import { CctvAdaptor } from "./js/cctvAdaptor.js"
+    import { StreamAdaptor } from "./js/streamAdaptor.js"
 
-    var player = videojs('video-player');
+    var adaptor = new StreamAdaptor({
+        videoId: "video-player"
+    });
+
+    adaptor.src({
+        type: "application/x-mpegURL",
+        src: "http://media.pictonm.com:5080/LiveApp/streams/41HLS.m3u8",
+    });
+
+    //adaptor.play();
+
+    
+    
+    /*var player = videojs('video-player');
     console.log('Created VideoJS Player');
     player.src({
         src: "http://media.pictonm.com:5080/LiveApp/streams/41HLS.m3u8",
@@ -92,11 +105,11 @@
     var cctvAdaptor = new CctvAdaptor({
         hlsStream: "http://media.pictonm.com:5080/LiveApp/streams/41HLS.m3u8",
         //webRtcSignalingServer: "ws://192.168.41.195:5080/WebRTCAppEE/websocket",
-    });
+    });*/
 
     //$("#hls-viewer").append(cctvAdaptor.getHlsVideo());
 
-    var start_play_button = document.getElementById("start_play_button");
+    /*var start_play_button = document.getElementById("start_play_button");
     start_play_button.addEventListener("click", startPlaying, false)
     var stop_play_button = document.getElementById("stop_play_button");
     stop_play_button.addEventListener("click", stopPlaying, false);
@@ -258,7 +271,7 @@
         }
     });
 
-    window.webRTCAdaptor = webRTCAdaptor;
+    window.webRTCAdaptor = webRTCAdaptor;*/
 </script>
 
 </html>
