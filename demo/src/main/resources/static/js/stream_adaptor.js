@@ -1,34 +1,69 @@
+import { WebRTCAdaptor } from "/js/webrtc_adaptor.js"
+
 export class StreamAdaptor{
 
-    #type
-    #src
-    #player
+    videoId
+    player
+    type
+    hls
+    webRTCAdaptor
     constructor(initialValues) {
-        this.videoId = null;
-
         for (var key in initialValues) {
             if (initialValues.hasOwnProperty(key)) {
                 this[key] = initialValues[key];
             }
         }
     }
-    
-    src(param) {
-        this.#type = param.type;
-        this.#src = param.src;
 
-        if (this.#type == "application/x-mpegURL") {
-            this.tryToPlay(this.#src, this.hlsNoStreamCallback);
-            this.initializePlayer(this.#type, this.#src);
-        }
-    }
+    initializePlayer(param) {
 
-    initializePlayer(type, src) {
-        if (type == "application/x-mpegURL") {
-            this.#player = videojs(this.videoId);
-            this.#player.src({
-                type: type,
-                src: src
+        this.type = param.type;
+
+        if (param.type.toLowerCase() == "hls") {
+            var video = document.getElementById(this.videoId);
+            if (Hls.isSupported()) {
+                this.hls = new Hls();
+                this.hls.loadSource(param.src);
+                this.hls.attachMedia(video);
+            } else if(video.canPlayType("application/vnd.apple.mpegurl")) {
+                video.src = param.src;
+            }
+        } else if(param.type.toLowerCase() == "webrtc") {
+            var pc_config = {
+                'iceServers': [{
+                    'urls': 'stun:stun1.l.google.com:19302'
+                }]
+            };
+            var sdpConstraints = {
+                OfferToReceiveAudio: true,
+                OfferToReceiveVideo: true
+        
+            };
+            var mediaConstraints = {
+                video: false,
+                audio: false
+            };
+            this.webRTCAdaptor = new WebRTCAdaptor({
+                websocket_url: param.websocketURL,
+                mediaConstraints: mediaConstraints,
+                peerconnection_config: pc_config,
+                sdp_constraints: sdpConstraints,
+                remoteVideoId: this.videoId,
+                isPlayMode: true,
+                candidateTypes: ["tcp", "udp"],
+                callback : function(info) {
+                    if (info == "initialized") {
+                        console.debug("initialized");
+                    } else if (info == "play_started") {
+                        console.debug("play started");
+                    } else if (info == "play_finished") {
+                        console.debug("play finished");
+                    }
+                },
+                callbackError : function(error) {
+                    console.error("error callback: " + error);
+                    alert(error);
+                }
             });
         }
     }
@@ -47,13 +82,28 @@ export class StreamAdaptor{
         });
     }
 
-    play() {
-        if (this.#type == "application/x-mpegURL") {
-            this.#player.play();
+    play(src) {
+        var video = document.getElementById(this.videoId);
+        if (this.type.toLowerCase() == "hls") {
+            video.play();
+        } else if(this.type.toLowerCase() == "webrtc") {
+            this.webRTCAdaptor.play(src);
+            video.play();
+        }
+    }
+
+    pause() {
+        var video = document.getElementById(this.videoId);
+        if (this.type.toLowerCase() == "hls") {
+            video.pause();
+        }
+        else if (this.type.toLowerCase() == "webrtc") {
+            this.webRTCAdaptor.stop();
+            video.pause();
         }
     }
 
     hlsNoStreamCallback() {
-        alert("No stream found");
+        console.error("No stream found!");
     }
 }

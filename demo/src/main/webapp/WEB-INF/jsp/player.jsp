@@ -7,63 +7,22 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 
-    <style>
-        video {
-            width: 100%;
-            max-width: 640px;
-        }
 
-        /* Everything but the jumbotron gets side spacing for mobile first views */
-        .header,
-        .marketing,
-        .footer {
-            padding: 15px;
-        }
+    
 
-        /* Custom page header */
-        .header {
-            padding-bottom: 20px;
-        }
+    <script src="/js/adapter-7.2.5.js"></script>
+    <script src="/js/hls.min.js"></script>
 
-        /* Customize container */
-        @media (min-width : 768px) {
-            .container {
-                max-width: 730px;
-            }
-        }
-
-        .container-narrow>hr {
-            margin: 30px 0;
-        }
-
-        /* Main marketing message and sign up button */
-        .jumbotron {
-            text-align: center;
-        }
-
-        /* Responsive: Portrait tablets and up */
-        @media screen and (min-width: 768px) {
-
-            /* Remove the padding we set earlier */
-            .header,
-            .marketing,
-            .footer {
-                padding-right: 0;
-                padding-left: 0;
-            }
-        }
-
-        .options {
-            display: none;
-        }
-    </style>
+    
 </head>
 
 <body>
 
     <div class="container">
+
+        <video id="vjs-video" controls preload="auto" muted width="640" height="360"></video>
+
         <div class="header clearfix">
             <div class="row">
                 <h3 class="col text-muted">WebRTC Play</h3>
@@ -75,11 +34,10 @@
             </div>
         </div>
 
-
         <div class="jumbotron">
 
             <div class="col-sm-12 form-group">
-                <video id="remoteVideo" autoplay controls playsinline></video>
+                
             </div>
             <div class="form-group col-sm-12 text-left">
                 <input type="text" class="form-control" id="streamName" placeholder="Type stream name">
@@ -159,7 +117,43 @@
 
 </body>
 <script type="module">
-    import { WebRTCAdaptor } from "./js/webrtc_adaptor.js"
+
+    import { StreamAdaptor } from "/js/stream_adaptor.js"
+
+    var adaptor = new StreamAdaptor({
+        videoId: "vjs-video"
+    });
+
+    /*adaptor.initializePlayer({
+        type: "hls",
+        src: "http://192.168.41.195:5080/LiveApp/streams/18HLS.m3u8"
+    });*/
+
+    adaptor.initializePlayer({
+        type: "WebRTC",
+        websocketURL: "ws://192.168.41.195:5080/LiveApp/websocket"
+    });
+
+    //adaptor.initializePlayer("application/x-mpegURL");
+    //adaptor.initializePlayer("WebRTC", "ws://192.168.41.195:5080/LiveApp/websocket");
+
+    var start_play_button = document.getElementById("start_play_button");
+    start_play_button.addEventListener("click", startPlaying, false)
+
+
+    function startPlaying() {
+        adaptor.play("18HLS");
+        //adaptor.play();
+    }
+
+
+    /*streamAdaptor.src({
+        type: "WebRTC",
+        src: "192.168.41.195:5080/LiveApp/websocket"
+    });*/
+
+
+    /*import { WebRTCAdaptor } from "./js/webrtc_adaptor.js"
     import { getUrlParameter } from "./js/fetch.stream.js"
 
     var token = getUrlParameter("token");
@@ -460,7 +454,7 @@
         }
     });
 
-    window.webRTCAdaptor = webRTCAdaptor;
+    window.webRTCAdaptor = webRTCAdaptor;*/
 </script>
 
 </html>
